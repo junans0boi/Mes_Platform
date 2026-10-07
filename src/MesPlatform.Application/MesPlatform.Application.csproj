@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\MesPlatform.Domain\MesPlatform.Domain.csproj" />
+  </ItemGroup>
+</Project>

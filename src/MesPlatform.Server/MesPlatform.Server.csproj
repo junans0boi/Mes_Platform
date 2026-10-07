@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\MesPlatform.Application\MesPlatform.Application.csproj" />
+    <ProjectReference Include="..\MesPlatform.Infrastructure\MesPlatform.Infrastructure.csproj" />
+    <ProjectReference Include="..\MesPlatform.Contracts\MesPlatform.Contracts.csproj" />
+  </ItemGroup>
+</Project>

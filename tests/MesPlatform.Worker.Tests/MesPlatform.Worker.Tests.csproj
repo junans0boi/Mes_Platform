@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MesPlatform.Worker\MesPlatform.Worker.csproj" />
+    <ProjectReference Include="..\..\src\MesPlatform.Application\MesPlatform.Application.csproj" />
+    <ProjectReference Include="..\..\src\MesPlatform.Infrastructure\MesPlatform.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

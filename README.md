@@ -38,6 +38,21 @@ docs/decisions/             durable decisions and rejected alternatives
 docs/tickets/               ticket sets before external registration
 ```
 
+## Backend
+
+The backend is a modular monolith in `MesPlatform.sln` (.NET SDK 10.0.400, `net10.0`).
+
+- `MesPlatform.Server` (HTTP API and SignalR Hub) and `MesPlatform.Worker` (background processing) are **separate processes**. They are the only executable projects.
+- Project dependencies point inward only: `Domain ← Application ← Infrastructure ← Server/Worker`. `Contracts` references no project. `tests/MesPlatform.Architecture.Tests` enforces this.
+- The Worker is disabled by default in development (the safe host is built in BE-04).
+- Local tests must never connect to a production database. Use a dedicated test connection string (database tickets BE-02, DB-01).
+
+```bash
+dotnet restore MesPlatform.sln
+dotnet build MesPlatform.sln -c Release
+dotnet test MesPlatform.sln -c Release
+```
+
 ## Planned solution shape
 
 ```text
