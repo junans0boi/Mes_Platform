@@ -39,4 +39,6 @@ npm run dev
 - 401을 받으면 세션을 끝내고 현재 주소를 `returnTo`로 보존해 로그인으로 이동한다. 로그아웃은 메모리 token과 서버 상태 cache만 지운다(서버 로그아웃 호출은 FE-13 이후).
 - Plant 이름은 아직 API가 없어 `Plant {id}`로 표시한다.
 - API 계약(`contracts/openapi.yaml`)이 단일 원본이다. 경로와 응답 타입을 프론트에서 만들지 않고 `generated/`와 `platform/api/httpClient.ts`를 쓴다. 테스트 mock은 계약에서 생성한다(`src/test/contractMock.ts`).
+- `/dev/grid`는 FE-05 검증용 임시 화면(공통 목록 패턴 예제)이다. FE-06에서 실제 목록이 들어오면 제거한다.
+- 라이선스 키가 없으면 목록에 "MUI X Missing license key" 표시와 콘솔 오류가 나온다(동작에는 영향 없음).
 - MUI X DataGrid Premium 라이선스 키는 `.env.local`의 `VITE_MUIX_LICENSE_KEY`로만 주입한다.

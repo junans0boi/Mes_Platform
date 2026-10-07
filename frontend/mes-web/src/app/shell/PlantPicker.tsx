@@ -17,17 +17,17 @@ export function PlantPicker() {
   const label = t('signalBar.plant');
   if (plantId === null) {
     return (
-      <span>
-        {label} <strong>{t('signalBar.plantNoneAllowed')}</strong>
-      </span>
+      <strong aria-label={`${label}: ${t('signalBar.plantNoneAllowed')}`}>
+        {t('signalBar.plantNoneAllowed')}
+      </strong>
     );
   }
   const current = t('signalBar.plantValue', { id: plantId });
   if (allowedPlantIds.length < 2) {
     return (
-      <span>
-        {label} <strong style={{ color: theme.mes.ink }}>{current}</strong>
-      </span>
+      <strong style={{ color: theme.mes.ink }} aria-label={`${label}: ${current}`}>
+        {current}
+      </strong>
     );
   }
   return (
@@ -41,7 +41,7 @@ export function PlantPicker() {
         onClick={(e) => setAnchor(e.currentTarget)}
         sx={{ color: theme.mes.ink, fontWeight: 600, textTransform: 'none' }}
       >
-        {label} {current}
+        {current}
       </Button>
       <Menu
         anchorEl={anchor}

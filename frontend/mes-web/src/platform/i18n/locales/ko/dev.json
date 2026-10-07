@@ -43,5 +43,33 @@
     "colUpdated": "갱신 시각",
     "selected": "선택한 작업지시: {{number}}",
     "selectedNone": "행을 눌러 선택을 확인하세요"
+  },
+  "grid": {
+    "title": "목록 패턴 확인",
+    "intro": "FE-05 공통 목록 패턴(cursor 이동, 서버 정렬, 주소 복원, 검색 패널) 예제입니다. 실제 업무 목록은 FE-06에서 만듭니다.",
+    "ariaLabel": "예제 작업지시 목록",
+    "fields": {
+      "prefix": "작업지시번호 접두",
+      "status": "상태",
+      "planned": "계획 기간"
+    },
+    "columns": {
+      "workOrderNumber": "작업지시번호",
+      "status": "상태",
+      "plannedQuantity": "계획 수량",
+      "completedQuantity": "완료 수량",
+      "plannedStartAt": "계획 시작",
+      "priority": "우선순위"
+    },
+    "status": {
+      "PLANNED": "계획",
+      "READY": "준비",
+      "IN_PROGRESS": "진행 중",
+      "COMPLETED": "생산 종료",
+      "FINISHED": "마감",
+      "CANCELED": "취소"
+    },
+    "detailTitle": "{{number}} 상세",
+    "noPlant": "선택할 수 있는 Plant가 없어 목록을 조회하지 않습니다."
   }
 }

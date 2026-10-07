@@ -19,7 +19,7 @@ export interface RouteEntry {
   load: () => Promise<{ default: ComponentType }>;
 }
 
-// ponytail: 아래 /dev/* 두 화면은 FE-03 검증용 임시 route다. FE-06에서 실제 화면이 들어오면 제거한다.
+// ponytail: 아래 /dev/* 화면은 FE-03·FE-05 검증용 임시 route다. FE-06에서 실제 화면이 들어오면 제거한다.
 export const routeRegistry: RouteEntry[] = [
   {
     meta: {
@@ -45,6 +45,19 @@ export const routeRegistry: RouteEntry[] = [
     load: async () => {
       await ensureNamespace('dev');
       return import('@/modules/dev/DensityPreviewPage');
+    },
+  },
+  {
+    meta: {
+      path: '/dev/grid',
+      titleKey: 'dev:grid.title',
+      capability: 'Dev.Preview.Read',
+      module: 'dev',
+      icon: 'table',
+    },
+    load: async () => {
+      await ensureNamespace('dev');
+      return import('@/modules/dev/GridExamplePage');
     },
   },
 ];

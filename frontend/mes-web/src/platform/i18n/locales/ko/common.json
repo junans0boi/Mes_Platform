@@ -1,6 +1,63 @@
 {
-  "signal": { "ok": "정상", "running": "진행 중", "delayed": "지연", "fault": "이상", "idle": "대기" },
-  "ribbon": { "label": "상태별 건수" },
-  "action": { "retry": "다시 시도", "close": "닫기", "openMenu": "메뉴 열기" },
-  "state": { "loading": "불러오는 중입니다", "empty": "표시할 항목이 없습니다" }
+  "signal": {
+    "ok": "정상",
+    "running": "진행 중",
+    "delayed": "지연",
+    "fault": "이상",
+    "idle": "대기"
+  },
+  "ribbon": {
+    "label": "상태별 건수"
+  },
+  "action": {
+    "retry": "다시 시도",
+    "close": "닫기",
+    "openMenu": "메뉴 열기"
+  },
+  "state": {
+    "loading": "불러오는 중입니다",
+    "empty": "표시할 항목이 없습니다"
+  },
+  "feedback": {
+    "loading": "불러오는 중입니다",
+    "emptyTitle": "조건에 맞는 항목이 없습니다",
+    "emptyBody": "검색 조건을 바꾸거나 초기화해 보세요.",
+    "errorTitle": "목록을 불러오지 못했습니다",
+    "requestId": "요청 번호",
+    "retry": "다시 시도",
+    "kind": {
+      "unauthorized": "로그인이 필요합니다.",
+      "forbidden": "이 항목을 볼 권한이 없습니다.",
+      "notFound": "대상을 찾을 수 없습니다.",
+      "conflict": "다른 변경과 충돌했습니다. 최신 내용을 다시 불러오세요.",
+      "badRequest": "요청 형식이 올바르지 않습니다.",
+      "unprocessable": "업무 규칙에 맞지 않는 요청입니다.",
+      "server": "서버에서 오류가 발생했습니다.",
+      "network": "서버에 연결하지 못했습니다. 연결을 확인하세요.",
+      "aborted": "요청이 취소되었습니다.",
+      "unexpected": "예기치 않은 오류가 발생했습니다."
+    }
+  },
+  "grid": {
+    "label": "목록",
+    "prev": "이전",
+    "next": "다음",
+    "pageInfo": "{{count}}건 표시",
+    "firstPage": "첫 페이지",
+    "moreAvailable": "다음 페이지가 있습니다",
+    "lastPage": "마지막 페이지입니다",
+    "columns": "열 설정",
+    "refreshing": "갱신 중",
+    "asOf": "기준 시각 {{time}}"
+  },
+  "search": {
+    "label": "검색 조건",
+    "submit": "검색",
+    "reset": "초기화",
+    "from": "시작",
+    "to": "종료"
+  },
+  "detail": {
+    "close": "상세 닫기"
+  }
 }

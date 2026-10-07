@@ -1,6 +1,63 @@
 {
-  "signal": { "ok": "Normal", "running": "Running", "delayed": "Delayed", "fault": "Fault", "idle": "Idle" },
-  "ribbon": { "label": "Count by status" },
-  "action": { "retry": "Retry", "close": "Close", "openMenu": "Open menu" },
-  "state": { "loading": "Loading", "empty": "Nothing to show" }
+  "signal": {
+    "ok": "Normal",
+    "running": "Running",
+    "delayed": "Delayed",
+    "fault": "Fault",
+    "idle": "Idle"
+  },
+  "ribbon": {
+    "label": "Count by status"
+  },
+  "action": {
+    "retry": "Retry",
+    "close": "Close",
+    "openMenu": "Open menu"
+  },
+  "state": {
+    "loading": "Loading",
+    "empty": "Nothing to show"
+  },
+  "feedback": {
+    "loading": "Loading",
+    "emptyTitle": "No items match",
+    "emptyBody": "Change or reset the search conditions.",
+    "errorTitle": "Could not load the list",
+    "requestId": "Request ID",
+    "retry": "Retry",
+    "kind": {
+      "unauthorized": "Sign in is required.",
+      "forbidden": "You do not have permission to view this.",
+      "notFound": "The item was not found.",
+      "conflict": "This conflicts with another change. Reload the latest data.",
+      "badRequest": "The request is not valid.",
+      "unprocessable": "The request breaks a business rule.",
+      "server": "The server reported an error.",
+      "network": "Could not reach the server. Check the connection.",
+      "aborted": "The request was cancelled.",
+      "unexpected": "An unexpected error occurred."
+    }
+  },
+  "grid": {
+    "label": "List",
+    "prev": "Previous",
+    "next": "Next",
+    "pageInfo": "{{count}} shown",
+    "firstPage": "First page",
+    "moreAvailable": "More pages available",
+    "lastPage": "Last page",
+    "columns": "Columns",
+    "refreshing": "Refreshing",
+    "asOf": "As of {{time}}"
+  },
+  "search": {
+    "label": "Search conditions",
+    "submit": "Search",
+    "reset": "Reset",
+    "from": "From",
+    "to": "To"
+  },
+  "detail": {
+    "close": "Close details"
+  }
 }

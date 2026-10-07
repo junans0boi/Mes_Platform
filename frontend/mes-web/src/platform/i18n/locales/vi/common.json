@@ -1,6 +1,63 @@
 {
-  "signal": { "ok": "Bình thường", "running": "Đang chạy", "delayed": "Chậm", "fault": "Lỗi", "idle": "Chờ" },
-  "ribbon": { "label": "Số lượng theo trạng thái" },
-  "action": { "retry": "Thử lại", "close": "Đóng", "openMenu": "Mở menu" },
-  "state": { "loading": "Đang tải", "empty": "Không có mục nào" }
+  "signal": {
+    "ok": "Bình thường",
+    "running": "Đang chạy",
+    "delayed": "Chậm",
+    "fault": "Lỗi",
+    "idle": "Chờ"
+  },
+  "ribbon": {
+    "label": "Số lượng theo trạng thái"
+  },
+  "action": {
+    "retry": "Thử lại",
+    "close": "Đóng",
+    "openMenu": "Mở menu"
+  },
+  "state": {
+    "loading": "Đang tải",
+    "empty": "Không có mục nào"
+  },
+  "feedback": {
+    "loading": "Đang tải",
+    "emptyTitle": "Không có mục phù hợp",
+    "emptyBody": "Hãy đổi hoặc đặt lại điều kiện tìm kiếm.",
+    "errorTitle": "Không tải được danh sách",
+    "requestId": "Mã yêu cầu",
+    "retry": "Thử lại",
+    "kind": {
+      "unauthorized": "Cần đăng nhập.",
+      "forbidden": "Bạn không có quyền xem mục này.",
+      "notFound": "Không tìm thấy mục.",
+      "conflict": "Xung đột với thay đổi khác. Hãy tải lại dữ liệu mới nhất.",
+      "badRequest": "Yêu cầu không hợp lệ.",
+      "unprocessable": "Yêu cầu vi phạm quy tắc nghiệp vụ.",
+      "server": "Máy chủ báo lỗi.",
+      "network": "Không kết nối được với máy chủ. Kiểm tra kết nối.",
+      "aborted": "Yêu cầu đã bị hủy.",
+      "unexpected": "Đã xảy ra lỗi không mong muốn."
+    }
+  },
+  "grid": {
+    "label": "Danh sách",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "pageInfo": "Hiển thị {{count}}",
+    "firstPage": "Trang đầu",
+    "moreAvailable": "Còn trang tiếp theo",
+    "lastPage": "Trang cuối",
+    "columns": "Cột",
+    "refreshing": "Đang cập nhật",
+    "asOf": "Tại thời điểm {{time}}"
+  },
+  "search": {
+    "label": "Điều kiện tìm kiếm",
+    "submit": "Tìm",
+    "reset": "Đặt lại",
+    "from": "Từ",
+    "to": "Đến"
+  },
+  "detail": {
+    "close": "Đóng chi tiết"
+  }
 }
