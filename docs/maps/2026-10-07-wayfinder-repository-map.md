@@ -98,7 +98,7 @@ platform → (shared pure utils 만)
 | 알림 Hub | `src/hooks/useNotificationHub.ts:64-96` | 15초 polling 보완 |
 | Projection 설계 | Kdit `docs/superpowers/specs/2026-10-07-*` | 복사본이 `docs/specs/backend|database` |
 
-WorkOrder 상태 값은 Kdit에서 자유 문자열이라 상태 전이표를 Kdit에서 복원할 수 없다. 백엔드 결정 항목 24.2로 남긴다.
+정정(2026-10-07): 프론트엔드 모델의 `status: string`만 보고 "전이표를 복원할 수 없다"고 적었으나, Kdit 백엔드 `WorkOrderController`에 상태 목록(`PLANNED`, `READY`, `IN_PROGRESS`, `COMPLETED`, `FINISHED`, `CANCELED`)과 전이 규칙(`CanTransitionWorkOrderStatus`)이 구현되어 있다. 복원 결과와 신규 플랫폼 제안은 `docs/decisions/proposals/2026-10-07-be-06-workorder-status-transitions-proposal.md`에 있으며 업무 담당자 확인 후 BE-06이 확정한다.
 
 ## 6. 기존 규약
 
