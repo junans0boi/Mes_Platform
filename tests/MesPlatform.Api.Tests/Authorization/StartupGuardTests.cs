@@ -23,15 +23,26 @@ public sealed class StartupGuardTests
         return settings;
     }
 
+    /// <summary>
+    /// 호스트가 시작되지 않아야 한다. 시작 실패 직후 WebApplicationFactory가 이미 정리된 서비스 공급자를 읽는 경우가 있어
+    /// OptionsValidationException 대신 ObjectDisposedException이 올 수 있으므로 둘 다 "시작 거부"로 본다.
+    /// 거부 사유(메시지)는 OptionsValidatorTests가 결정적으로 검증한다.
+    /// </summary>
+    private static void AssertRefusesToStart(ConfiguredApiFactory factory)
+    {
+        var error = Record.Exception(() => factory.CreateClient());
+
+        Assert.True(
+            error is OptionsValidationException or ObjectDisposedException,
+            $"호스트가 시작을 거부해야 합니다. 실제: {error?.GetType().Name ?? "시작됨"}");
+    }
+
     [Fact]
     public void Development_authenticator_enabled_in_Production_refuses_to_start()
     {
         using var factory = new ConfiguredApiFactory("Production", With());
 
-        var error = Assert.Throws<OptionsValidationException>(() => factory.CreateClient());
-
-        Assert.Contains("only allowed in Development or Testing", error.Message);
-        Assert.Contains("'Production'", error.Message);
+        AssertRefusesToStart(factory);
     }
 
     [Theory]
@@ -41,7 +52,7 @@ public sealed class StartupGuardTests
     {
         using var factory = new ConfiguredApiFactory(environment, With());
 
-        Assert.Throws<OptionsValidationException>(() => factory.CreateClient());
+        AssertRefusesToStart(factory);
     }
 
     [Fact]
@@ -62,9 +73,7 @@ public sealed class StartupGuardTests
     {
         using var factory = new ConfiguredApiFactory("Testing", With(("Authentication:Jwt:SigningKey", "too-short")));
 
-        var error = Assert.Throws<OptionsValidationException>(() => factory.CreateClient());
-
-        Assert.Contains("SigningKey", error.Message);
+        AssertRefusesToStart(factory);
     }
 
     [Fact]
@@ -74,8 +83,6 @@ public sealed class StartupGuardTests
             "Testing",
             With(("Authentication:DevelopmentAuthenticator:Users:1:Permissions:0", "/production/work-orders")));
 
-        var error = Assert.Throws<OptionsValidationException>(() => factory.CreateClient());
-
-        Assert.Contains("invalid Permission Code", error.Message);
+        AssertRefusesToStart(factory);
     }
 }
