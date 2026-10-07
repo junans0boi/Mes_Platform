@@ -1,4 +1,4 @@
-using MesPlatform.Contracts.Common;
+using MesPlatform.Server.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 
@@ -8,6 +8,7 @@ namespace MesPlatform.Server.Controllers.System;
 [Route("api/v1/system")]
 public sealed class SystemController : ControllerBase
 {
+    [RequirePermission("System.Info.Read")]
     [HttpGet("info")]
     public IActionResult GetInfo()
     {
@@ -15,12 +16,6 @@ public sealed class SystemController : ControllerBase
             ?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
             ?.InformationalVersion ?? "unknown";
 
-        var data = new { application = "MesPlatform", version };
-        var meta = new ApiMeta(
-            RequestId: Guid.NewGuid(),
-            OperationId: null,
-            ServerTime: DateTimeOffset.UtcNow);
-
-        return Ok(new ApiEnvelope<object>(data, meta));
+        return Ok(this.Envelope(new { application = "MesPlatform", version }));
     }
 }

@@ -76,19 +76,4 @@ public sealed class MesExceptionHandlerTests
     }
 }
 
-internal sealed class ExceptionTestFactory : WebApplicationFactory<Program>
-{
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        builder.UseEnvironment("Testing");
-        builder.ConfigureTestServices(services =>
-        {
-            // 테스트 컨트롤러를 서버에 등록
-            services.AddControllers()
-                .AddApplicationPart(typeof(TestThrowController).Assembly);
-
-            // DB 없이 /health/ready 통과
-            services.Configure<HealthCheckServiceOptions>(opts => opts.Registrations.Clear());
-        });
-    }
-}
+internal sealed class ExceptionTestFactory : ConfiguredApiFactory;

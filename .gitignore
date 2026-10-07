@@ -5,6 +5,7 @@
 *.swp
 
 # Secrets and local configuration
+appsettings.Development.json
 .env
 .env.*
 !.env.example
