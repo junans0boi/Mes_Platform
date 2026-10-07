@@ -1,0 +1,5 @@
+# 모든 플랫폼에서 LF로 체크아웃한다. .editorconfig(end_of_line = lf)와 같아야 Windows CI의 `dotnet format --verify-no-changes`가 통과한다.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.woff2 binary
