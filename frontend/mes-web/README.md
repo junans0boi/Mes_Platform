@@ -13,16 +13,18 @@ npm run dev
 
 ## 명령
 
-| 명령                   | 내용                                                               |
-| ---------------------- | ------------------------------------------------------------------ |
-| `npm run dev`          | 개발 서버 (`VITE_DEV_PROXY_TARGET`이 있으면 `/api`, `/hubs` proxy) |
-| `npm run typecheck`    | TypeScript 검사                                                    |
-| `npm run lint`         | ESLint                                                             |
-| `npm run format:check` | Prettier 검사                                                      |
-| `npm test`             | Vitest (jsdom, MSW)                                                |
-| `npm run build`        | 타입 검사 후 프로덕션 빌드                                         |
-| `npm run bundle:size`  | 빌드 후 JS gzip 크기 기록                                          |
-| `npm run e2e`          | Playwright (Chromium, 1366×768)                                    |
+| 명령                   | 내용                                                                       |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `npm run dev`          | 개발 서버 (`VITE_DEV_PROXY_TARGET`이 있으면 `/api`, `/hubs` proxy)         |
+| `npm run typecheck`    | TypeScript 검사                                                            |
+| `npm run lint`         | ESLint                                                                     |
+| `npm run format:check` | Prettier 검사                                                              |
+| `npm test`             | Vitest (jsdom, MSW)                                                        |
+| `npm run build`        | 타입 검사 후 프로덕션 빌드                                                 |
+| `npm run bundle:size`  | 빌드 후 JS gzip 크기 기록                                                  |
+| `npm run api:generate` | `contracts/openapi.yaml`에서 `src/platform/api/generated/schema.d.ts` 생성 |
+| `npm run api:check`    | 생성물이 계약과 일치하는지 확인(drift 시 실패)                             |
+| `npm run e2e`          | Playwright (Chromium, 1366×768)                                            |
 
 ## 디자인
 
@@ -34,5 +36,5 @@ npm run dev
 - capability는 임시로 모두 허용한다(`platform/authorization/capabilities.ts`). FE-04가 세션 값으로 교체한다.
 
 - 인증은 FE-04에서 구현한다. 토큰은 메모리에만 두므로 새로고침하면 다시 로그인해야 한다. silent refresh는 인증 계약(BE-05) 확정 후 FE-13에서 구현한다.
-- API 계약(`contracts/openapi.yaml`)은 CON-01 티켓이 작성한다. 그 전에는 API 경로와 응답 타입을 프론트에서 만들지 않는다.
+- API 계약(`contracts/openapi.yaml`)이 단일 원본이다. 경로와 응답 타입을 프론트에서 만들지 않고 `generated/`와 `platform/api/httpClient.ts`를 쓴다. 테스트 mock은 계약에서 생성한다(`src/test/contractMock.ts`).
 - MUI X DataGrid Premium 라이선스 키는 `.env.local`의 `VITE_MUIX_LICENSE_KEY`로만 주입한다.
