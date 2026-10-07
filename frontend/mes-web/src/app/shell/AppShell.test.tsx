@@ -25,7 +25,7 @@ describe('AppShell', () => {
   });
 
   it('capability가 없는 화면은 메뉴에서 숨기고 직접 접근하면 403 화면을 보여준다', async () => {
-    renderApp({ registry, initialPath: '/dev/b', capabilities: { has: (c) => c === 'Dev.A.Read' } });
+    renderApp({ registry, initialPath: '/dev/b', capabilities: ['Dev.A.Read'] });
     expect(await screen.findByText('이 화면을 볼 권한이 없습니다')).toBeInTheDocument();
     expect(screen.getByText(/Dev\.B\.Read/)).toBeInTheDocument();
     await userEvent.click(

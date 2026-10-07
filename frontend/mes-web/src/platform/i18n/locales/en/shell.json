@@ -43,7 +43,11 @@
       "comfortable": "Comfortable"
     },
     "ago": "{{count}}s ago",
-    "lastAsOf": "Last as of"
+    "lastAsOf": "Last as of",
+    "plantValue": "Plant {{id}}",
+    "plantSelect": "Select plant",
+    "plantNoneAllowed": "No accessible plant",
+    "logout": "Sign out"
   },
   "boot": {
     "loading": "Preparing the workspace",

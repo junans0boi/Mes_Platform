@@ -58,6 +58,7 @@ export function setLanguage(code: LanguageCode) {
 
 const loaders: Record<string, (lng: string) => Promise<{ default: object }>> = {
   dev: (lng) => import(`./locales/${lng}/dev.json`),
+  auth: (lng) => import(`./locales/${lng}/auth.json`),
 };
 
 // route lazy 로더가 호출한다. 해당 언어 리소스가 없으면 ko로 대체된다.

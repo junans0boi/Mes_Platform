@@ -13,7 +13,7 @@ export interface BootState {
   retry: () => void;
 }
 
-// ponytail: FE-04가 세션(사용자·capability·Plant 범위) 조회로 교체한다. 지금은 바로 성공한다.
+// 세션(사용자·capability·Plant 범위)은 로그인 때 AuthProvider가 이미 받았다. 이 loader는 화면별 시작 정보가 생기면 채운다.
 // 개발 서버에서만 ?__boot=fail-once 로 첫 시도 실패→재시도 흐름을 확인할 수 있다(E2E용).
 export const defaultBootstrapLoader: BootstrapLoader = async ({ attempt }) => {
   if (

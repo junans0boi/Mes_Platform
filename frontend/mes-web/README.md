@@ -33,8 +33,10 @@ npm run dev
 ## 현재 한계 (개발 중)
 
 - `/dev/signals`, `/dev/density`는 FE-03 검증용 임시 화면이다. FE-06에서 실제 화면이 들어오면 제거한다.
-- capability는 임시로 모두 허용한다(`platform/authorization/capabilities.ts`). FE-04가 세션 값으로 교체한다.
+- capability와 허용 Plant는 로그인 세션(`GET /api/v1/auth/session`) 값이다. 로그인하지 않았거나 Provider 밖에서는 아무것도 허용하지 않는다. 서버가 최종 검증한다.
 
-- 인증은 FE-04에서 구현한다. 토큰은 메모리에만 두므로 새로고침하면 다시 로그인해야 한다. silent refresh는 인증 계약(BE-05) 확정 후 FE-13에서 구현한다.
+- **새로고침하면 다시 로그인해야 한다(개발 중 한계).** access token은 JS 메모리(`platform/auth/tokenStore.ts`)에만 두고 storage·cookie에는 쓰지 않는다. silent refresh는 FE-13(BE-11 구현 후)에서 구현하며, 이 구조는 운영 최종안이 아니다.
+- 401을 받으면 세션을 끝내고 현재 주소를 `returnTo`로 보존해 로그인으로 이동한다. 로그아웃은 메모리 token과 서버 상태 cache만 지운다(서버 로그아웃 호출은 FE-13 이후).
+- Plant 이름은 아직 API가 없어 `Plant {id}`로 표시한다.
 - API 계약(`contracts/openapi.yaml`)이 단일 원본이다. 경로와 응답 타입을 프론트에서 만들지 않고 `generated/`와 `platform/api/httpClient.ts`를 쓴다. 테스트 mock은 계약에서 생성한다(`src/test/contractMock.ts`).
 - MUI X DataGrid Premium 라이선스 키는 `.env.local`의 `VITE_MUIX_LICENSE_KEY`로만 주입한다.

@@ -15,12 +15,14 @@ import { useTheme } from '@mui/material/styles';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useAuth } from '@/platform/auth/authContext';
 import { useCapabilities } from '@/platform/authorization/capabilities';
 import { setLanguage, supportedLanguages, type LanguageCode } from '@/platform/i18n';
 import { useUiSettings, type ThemeChoice } from '@/platform/preferences/uiSettings';
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge';
 import type { RouteEntry } from '../router/routeRegistry';
 import type { Density } from '../theme/tokens';
+import { PlantPicker } from './PlantPicker';
 import { connectionSignal } from './connection';
 import { useShellContext } from './shellContext';
 
@@ -31,6 +33,7 @@ export function TopBar({ registry }: { registry: RouteEntry[] }) {
   const { t } = useTranslation(['shell', 'dev']);
   const { has } = useCapabilities();
   const { value } = useShellContext();
+  const { logout } = useAuth();
   const narrow = useMediaQuery('(max-width:1099.95px)');
   const tiny = useMediaQuery('(max-width:899.95px)');
   const location = useLocation();
@@ -108,7 +111,7 @@ export function TopBar({ registry }: { registry: RouteEntry[] }) {
         {value.delayedCount > 0 ? (
           <StatusBadge state="delayed" label={`${t('common:signal.delayed')} ${value.delayedCount}`} />
         ) : null}
-        <Item label={t('shell:signalBar.plant')}>{value.plantName ?? t('shell:signalBar.plantNone')}</Item>
+        <PlantPicker />
         <Box
           role={value.connection === 'disconnected' ? 'alert' : 'status'}
           sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}
@@ -134,6 +137,9 @@ export function TopBar({ registry }: { registry: RouteEntry[] }) {
           </Typography>
         )}
         <DisplaySettings />
+        <Button size="small" onClick={logout} sx={{ color: theme.mes.inkMuted, whiteSpace: 'nowrap' }}>
+          {t('shell:signalBar.logout')}
+        </Button>
       </Box>
     </Box>
   );

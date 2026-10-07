@@ -6,6 +6,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import type { RouteEntry } from '../router/routeRegistry';
 import { Beacon } from './Beacon';
 import { BootState } from './BootState';
+import { ShellIdentity } from './ShellIdentity';
 import { ShellProvider } from './ShellProvider';
 import { TopBar } from './TopBar';
 import { WorkspaceTabs } from './WorkspaceTabs';
@@ -33,6 +34,7 @@ export function AppShell({ registry, bootstrap }: AppShellProps) {
 
   return (
     <ShellProvider>
+      <ShellIdentity />
       <Box
         sx={{
           display: 'flex',

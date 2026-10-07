@@ -43,7 +43,11 @@
       "comfortable": "여유 있게"
     },
     "ago": "{{count}}초 전",
-    "lastAsOf": "마지막 기준"
+    "lastAsOf": "마지막 기준",
+    "plantValue": "Plant {{id}}",
+    "plantSelect": "Plant 선택",
+    "plantNoneAllowed": "접근 가능한 Plant 없음",
+    "logout": "로그아웃"
   },
   "boot": {
     "loading": "화면을 준비하고 있습니다",

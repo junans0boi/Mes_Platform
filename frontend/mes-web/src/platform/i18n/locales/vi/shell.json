@@ -43,7 +43,11 @@
       "comfortable": "Rộng"
     },
     "ago": "{{count}} giây trước",
-    "lastAsOf": "Lần cuối"
+    "lastAsOf": "Lần cuối",
+    "plantValue": "Plant {{id}}",
+    "plantSelect": "Chọn Plant",
+    "plantNoneAllowed": "Không có Plant được phép",
+    "logout": "Đăng xuất"
   },
   "boot": {
     "loading": "Đang chuẩn bị màn hình",

@@ -6,7 +6,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useMemo, useState, type ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
+import { AuthProvider, type AuthProviderProps } from '@/platform/auth/AuthProvider';
 import i18n from '@/platform/i18n';
+import { PlantProvider } from '@/platform/plant/PlantProvider';
 import { UiSettingsProvider } from '@/platform/preferences/UiSettingsProvider';
 import { useUiSettings } from '@/platform/preferences/uiSettings';
 import { createMesTheme } from '../theme/createMesTheme';
@@ -24,8 +26,14 @@ function MesTheme({ children }: { children: ReactNode }) {
   );
 }
 
-// Provider 순서: QueryClient → (Auth는 FE-04) → I18n → UI 설정/Theme. 각 Provider는 한 가지 책임만 가진다.
-export function AppProviders({ children }: { children: ReactNode }) {
+// Provider 순서: QueryClient → Auth → Plant → I18n → UI 설정/Theme. 각 Provider는 한 가지 책임만 가진다.
+export function AppProviders({
+  children,
+  initialSession,
+}: {
+  children: ReactNode;
+  initialSession?: AuthProviderProps['initialSession'];
+}) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -34,11 +42,15 @@ export function AppProviders({ children }: { children: ReactNode }) {
   );
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nextProvider i18n={i18n}>
-        <UiSettingsProvider>
-          <MesTheme>{children}</MesTheme>
-        </UiSettingsProvider>
-      </I18nextProvider>
+      <AuthProvider initialSession={initialSession}>
+        <PlantProvider>
+          <I18nextProvider i18n={i18n}>
+            <UiSettingsProvider>
+              <MesTheme>{children}</MesTheme>
+            </UiSettingsProvider>
+          </I18nextProvider>
+        </PlantProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

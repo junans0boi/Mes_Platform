@@ -5,10 +5,10 @@ export interface CapabilitySource {
   has: (code: string) => boolean;
 }
 
-// ponytail: FE-04가 세션의 capability 목록으로 이 기본값을 교체한다. 그 전에는 모든 화면을 허용한다(임시).
-export const allowAllCapabilities: CapabilitySource = { has: () => true };
+// AuthProvider가 세션의 capability 목록으로 값을 채운다. Provider 밖에서는 아무것도 허용하지 않는다.
+export const denyAllCapabilities: CapabilitySource = { has: () => false };
 
-export const CapabilityContext = createContext<CapabilitySource>(allowAllCapabilities);
+export const CapabilityContext = createContext<CapabilitySource>(denyAllCapabilities);
 
 export function useCapabilities(): CapabilitySource {
   return useContext(CapabilityContext);

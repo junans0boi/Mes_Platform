@@ -1,6 +1,8 @@
 import type { ComponentType } from 'react';
 import { createBrowserRouter, createMemoryRouter, Navigate, type RouteObject } from 'react-router-dom';
 import { useCapabilities } from '@/platform/authorization/capabilities';
+import { ensureNamespace } from '@/platform/i18n';
+import { RequireAuth } from './RequireAuth';
 import { AccessDenied, InitialLoading, NotFound, RouteError } from '../shell/RouteStates';
 import { AppShell } from '../shell/AppShell';
 import type { BootstrapLoader } from '../shell/bootstrap';
@@ -15,9 +17,22 @@ function guard(entry: RouteEntry, Page: ComponentType): ComponentType {
 
 function toRoutes(registry: RouteEntry[], bootstrap: BootstrapLoader): RouteObject[] {
   return [
+    // 로그인 화면은 AppShell 밖의 전체 화면이다.
+    {
+      path: '/login',
+      errorElement: <RouteError />,
+      lazy: async () => {
+        await ensureNamespace('auth');
+        return { Component: (await import('@/modules/auth/LoginPage')).default };
+      },
+    },
     {
       path: '/',
-      element: <AppShell registry={registry} bootstrap={bootstrap} />,
+      element: (
+        <RequireAuth>
+          <AppShell registry={registry} bootstrap={bootstrap} />
+        </RequireAuth>
+      ),
       errorElement: <RouteError />,
       // 첫 화면 chunk를 불러오는 동안 보여준다(Shell 골격이 준비되기 전의 짧은 순간).
       hydrateFallbackElement: <InitialLoading />,

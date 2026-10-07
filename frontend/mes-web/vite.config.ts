@@ -28,6 +28,8 @@ export default defineConfig(({ mode }) => {
       setupFiles: ['./src/test/setup.ts'],
       include: ['src/**/*.test.{ts,tsx}'],
       css: false,
+      // jsdom에는 현재 origin이 있지만 Node의 fetch는 상대 URL을 해석하지 못한다. 테스트는 절대 주소를 쓴다.
+      env: { VITE_API_BASE_URL: 'http://mes.test' },
     },
   };
 });
