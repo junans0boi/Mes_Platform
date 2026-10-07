@@ -4,4 +4,7 @@
     <ProjectReference Include="..\..\src\MesPlatform.Application\MesPlatform.Application.csproj" />
     <ProjectReference Include="..\..\src\MesPlatform.Domain\MesPlatform.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
 </Project>

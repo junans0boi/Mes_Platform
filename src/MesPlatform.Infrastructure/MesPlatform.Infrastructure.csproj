@@ -3,4 +3,9 @@
     <ProjectReference Include="..\MesPlatform.Application\MesPlatform.Application.csproj" />
     <ProjectReference Include="..\MesPlatform.Domain\MesPlatform.Domain.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+  </ItemGroup>
 </Project>

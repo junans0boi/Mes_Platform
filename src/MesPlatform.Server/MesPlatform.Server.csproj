@@ -4,4 +4,9 @@
     <ProjectReference Include="..\MesPlatform.Infrastructure\MesPlatform.Infrastructure.csproj" />
     <ProjectReference Include="..\MesPlatform.Contracts\MesPlatform.Contracts.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
 </Project>
