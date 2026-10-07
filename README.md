@@ -44,14 +44,23 @@ The backend is a modular monolith in `MesPlatform.sln` (.NET SDK 10.0.400, `net1
 
 - `MesPlatform.Server` (HTTP API and SignalR Hub) and `MesPlatform.Worker` (background processing) are **separate processes**. They are the only executable projects.
 - Project dependencies point inward only: `Domain ← Application ← Infrastructure ← Server/Worker`. `Contracts` references no project. `tests/MesPlatform.Architecture.Tests` enforces this.
-- The Worker is disabled by default in development (the safe host is built in BE-04).
-- Local tests must never connect to a production database. Use a dedicated test connection string (database tickets BE-02, DB-01).
+- The Worker does nothing by default. It starts only when `Worker:Enabled=true` **and** `Worker:ProcessRole=Worker`, and it refuses (exit code 2, no database connection) a blocked database name or any name containing `prod`. A disabled Worker exits with code 0.
+- Local tests must never connect to a production database. SQL integration tests (`Category=SqlIntegration`) run only when `MES_TEST_CONNECTION_STRING` is set explicitly; `scripts/verify.ps1` and CI never set it, and the script rejects production-looking connection strings.
+- Every response carries `X-Request-Id` and `X-Operation-Id`, including error responses. Logs carry `TraceId`, `RequestId`, `OperationId`, `ActorUserId`, `PlantId`, `Endpoint`, `UseCase`; secrets are redacted.
 
 ```bash
-dotnet restore MesPlatform.sln
-dotnet build MesPlatform.sln -c Release
-dotnet test MesPlatform.sln -c Release
+# Full verification: restore, format check, Release build, tests (same as CI)
+pwsh scripts/verify.ps1
+
+# API (copy appsettings.Development.example.json to appsettings.Development.json first)
+dotnet run --project src/MesPlatform.Server
+
+# Worker (disabled unless configured)
+dotnet run --project src/MesPlatform.Worker
+Worker__Enabled=true Worker__ProcessRole=Worker dotnet run --project src/MesPlatform.Worker
 ```
+
+CI (`.github/workflows/build.yml`) runs `scripts/verify.ps1` on Windows with the SDK from `global.json` and no connection string.
 
 ## Planned solution shape
 

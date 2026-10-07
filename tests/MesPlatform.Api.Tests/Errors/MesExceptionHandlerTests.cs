@@ -1,5 +1,7 @@
-using MesPlatform.Application.Common.Errors;
+using System.Net;
+using System.Text.Json;
 using MesPlatform.Api.Tests.Host;
+using MesPlatform.Application.Common.Errors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,8 +9,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Net;
-using System.Text.Json;
 using Xunit;
 
 namespace MesPlatform.Api.Tests.Errors;

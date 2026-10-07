@@ -1,5 +1,5 @@
-using Microsoft.Data.SqlClient;
 using System.Reflection;
+using Microsoft.Data.SqlClient;
 using Xunit;
 
 namespace MesPlatform.Infrastructure.Tests.Database;

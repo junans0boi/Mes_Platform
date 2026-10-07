@@ -1,12 +1,14 @@
 using MesPlatform.Application.Abstractions.Identity;
+using MesPlatform.Application.Common.Operations;
 using MesPlatform.Infrastructure;
 using MesPlatform.Infrastructure.Identity;
+using MesPlatform.Infrastructure.Observability;
 using MesPlatform.Server.Authentication;
 using MesPlatform.Server.Authorization;
 using MesPlatform.Server.Errors;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace MesPlatform.Server.Configuration;
@@ -67,9 +69,21 @@ public static class ServerServiceRegistration
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
         app.UseExceptionHandler();
-        app.UseSerilogRequestLogging();
+        app.UseSerilogRequestLogging(options =>
+            options.EnrichDiagnosticContext = (diagnostics, http) =>
+            {
+                // 요청 요약 로그에도 같은 진단 속성을 붙인다. 이 시점에는 인증·Plant 검증이 끝나 있다.
+                var operation = http.RequestServices.GetService<IOperationContextAccessor>()?.Current;
+                var traceId = System.Diagnostics.Activity.Current?.TraceId.ToString() ?? http.TraceIdentifier;
+                foreach (var (name, value) in OperationLogScope.Properties(operation, traceId))
+                {
+                    diagnostics.Set(name, value);
+                }
+            });
         app.UseMiddleware<Middleware.RequestOperationContextMiddleware>();
+        app.UseMiddleware<Middleware.ResponseOperationHeadersMiddleware>();
         app.UseAuthentication();
+        app.UseMiddleware<Middleware.OperationLogScopeMiddleware>();
         app.UseAuthorization();
         app.MapControllers();
         app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions

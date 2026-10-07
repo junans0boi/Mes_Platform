@@ -1,0 +1,42 @@
+name: build
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'database/**'
+      - 'MesPlatform.sln'
+      - 'Directory.*'
+      - 'global.json'
+      - '.editorconfig'
+      - 'scripts/verify.ps1'
+      - '.github/workflows/build.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'database/**'
+      - 'MesPlatform.sln'
+      - 'Directory.*'
+      - 'global.json'
+      - '.editorconfig'
+      - 'scripts/verify.ps1'
+      - '.github/workflows/build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      # SDK 버전은 global.json 한 곳에서만 정한다.
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      # 연결 문자열을 설정하지 않는다. SQL 통합 테스트는 실행하지 않고 그 사실을 로그에 남긴다.
+      - name: Verify (restore, format, build, test)
+        shell: pwsh
+        run: ./scripts/verify.ps1

@@ -1,4 +1,5 @@
 using MesPlatform.Application.Abstractions.Identity;
+using MesPlatform.Application.Common.Operations;
 using MesPlatform.Contracts.Common;
 using MesPlatform.Server.Errors;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -23,6 +24,13 @@ public sealed class PlantScopedAttribute : Attribute, IAsyncActionFilter
             throw HttpProblemException.BadRequest(
                 ErrorCodes.PlantIdRequired,
                 [new ProblemFieldError(PlantIdArgument, ErrorCodes.PlantIdRequired)]);
+        }
+
+        // 요청에 명시된 Plant가 하나면 이후 로그와 감사 기록이 같은 값을 쓰도록 OperationContext에 남긴다.
+        var operations = context.HttpContext.RequestServices.GetRequiredService<IOperationContextAccessor>();
+        if (operations.Current is { } operation && plantIds.Distinct().Count() == 1)
+        {
+            operations.Set(operation with { PlantId = plantIds[0] });
         }
 
         var checker = context.HttpContext.RequestServices.GetRequiredService<IPermissionChecker>();

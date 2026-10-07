@@ -3,8 +3,8 @@ using System.Net.Http.Json;
 using System.Security.Claims;
 using MesPlatform.Api.Tests.Host;
 using MesPlatform.Server.Authorization;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace MesPlatform.Api.Tests.Authorization;
 

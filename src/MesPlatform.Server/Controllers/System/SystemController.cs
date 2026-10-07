@@ -1,6 +1,6 @@
+using System.Reflection;
 using MesPlatform.Server.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection;
 
 namespace MesPlatform.Server.Controllers.System;
 

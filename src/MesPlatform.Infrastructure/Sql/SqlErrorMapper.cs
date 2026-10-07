@@ -12,9 +12,9 @@ public static class SqlErrorMapper
         var code = ex.Number switch
         {
             2627 or 2601 => "DATABASE_DUPLICATE_KEY",        // unique constraint violation
-            547            => "DATABASE_FOREIGN_KEY_VIOLATION",
-            1205            => "DATABASE_DEADLOCK",
-            _              => "DATABASE_OPERATION_FAILED",
+            547 => "DATABASE_FOREIGN_KEY_VIOLATION",
+            1205 => "DATABASE_DEADLOCK",
+            _ => "DATABASE_OPERATION_FAILED",
         };
         return new ApplicationError(code, $"errors.{code.ToLowerInvariant().Replace('_', '.')}");
     }
