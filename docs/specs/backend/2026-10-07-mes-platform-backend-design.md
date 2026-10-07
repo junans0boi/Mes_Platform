@@ -829,7 +829,46 @@ Server ProjectionOutboxDispatcher (hosted service)
 - 실패는 attempt count와 다음 시도 시각(backoff)으로 retry하고, 최대 횟수를 넘으면 `Failed`로 남기며 `LastError`를 기록한다.
 - 이벤트 간 순서는 보장하지 않는다.
 - SignalR backplane(다중 Server 간 Hub 전달)은 다중 Server로 확장할 때의 후속 범위다. 단일 Server에서는 Dispatcher가 발행한 Hub 연결에 이벤트가 전달된다.
-- 구체적 lease 기간, backoff, 최대 시도 횟수, 보관 기간은 BE-12가 정하고 설정값으로 관리한다.
+- lease 기간, backoff, 최대 시도 횟수, 보관 기간은 아래 §13.4.1에서 확정한 설정값이다.
+
+#### 13.4.1 전달 정책 (BE-12 확정)
+
+설정 이름은 `Projection:Outbox:*`이며 값은 운영에서 조정할 수 있다. 아래는 기본값이다.
+
+| 설정 | 기본값 | 설명 |
+|---|---:|---|
+| `DispatcherEnabled` | Production 외 환경에서 false, Production true | 개발 환경에서 운영 DB에 연결해도 Dispatcher가 운영 이벤트를 가로채 `Published`로 표시하지 않게 한다. 차단된 DB 대상이면 시작을 거부한다(BE-04의 안전 실행 검사 재사용) |
+| `ClaimBatchSize` | 100 | 한 번에 claim하는 행 수 |
+| `LeaseSeconds` | 30 | claim 유효 시간. 배치가 작아 갱신(renew)은 두지 않는다 |
+| `PollIntervalMilliseconds` | 500 | 대기 행이 없을 때 polling 간격. 배치가 가득 차면 즉시 다시 claim한다 |
+| `MaxAttempts` | 10 | 이 횟수를 넘으면 `Failed` |
+| `BackoffBaseSeconds` / `BackoffMaxSeconds` | 2 / 60 | 다음 시도 = `min(base × 2^(attempt-1), max)`에 ±20% jitter |
+| `PublishedRetentionDays` | 7 | 발행 완료 행은 이 기간 후 삭제(Dispatcher가 1시간마다 `DELETE TOP (1000)` 반복) |
+| `FailedRetentionDays` | 30 | `Failed` 행은 운영자가 확인할 수 있도록 더 오래 보관한 뒤 삭제 |
+| `MaxChangedIdsPerEvent` | 200 | Worker가 한 행에 담는 `changedIds` 상한. 넘으면 `IsReset=1` 행으로 대체한다. 클라이언트는 이 id를 100개씩 나누어 재조회한다 |
+
+**Claim:** 단일 문장으로 `Status = 'Pending' AND NextAttemptAt <= now AND (LeaseExpiresAt IS NULL OR LeaseExpiresAt < now)`인 행을 `ProjectionChangeOutboxId` 순으로 `ClaimBatchSize`개 골라 `LeaseOwner`와 `LeaseExpiresAt`을 기록한다(`UPDLOCK, READPAST`, `OUTPUT`). `Status`는 발행 완료 전까지 `Pending`이고 lease가 claim 상태를 나타낸다. `LeaseOwner`는 `서버이름:프로세스ID:GUID`다.
+
+**완료 표시:** 발행 성공 후 `WHERE ProjectionChangeOutboxId = @id AND LeaseOwner = @owner`일 때만 `Status='Published'`, `PublishedAt`을 기록한다. 영향 행이 0이면(lease를 잃음) 무시한다.
+
+**발행:** 한 행이 한 이벤트다. 같은 Plant의 여러 행을 합치지 않는다(합치기는 FE-11 측정 후 필요하면 재검토). 이벤트 순서는 행 id 순서를 시도하지만 보장하지 않는다.
+
+**시나리오별 동작**
+
+| 시나리오 | 기대 동작 |
+|---|---|
+| Worker transaction 롤백 | Projection 행, `ProjectionVersion`, Outbox 행이 모두 롤백되어 이벤트가 없다. Queue 항목은 재시도 가능 상태가 된다 |
+| Server 중단 | Outbox 행이 `Pending`으로 남는다. Server가 돌아오면 이어서 claim해 발행한다. 유실이 없다 |
+| Dispatcher 재시작 | 처리 중이던 행은 lease가 만료된 뒤 다시 claim된다 |
+| 중복 발행 | 발행은 됐지만 `Published` 기록 전에 중단되면 lease 만료 후 같은 이벤트가 다시 발행된다. 허용한다. 클라이언트는 id 재조회와 `projectionVersion` 비교로 병합한다 |
+| 발행 실패(예외) | `AttemptCount` 증가, backoff로 `NextAttemptAt` 설정, lease 해제, `LastError` 기록(SQL·스택 문자열 없이 요약, 최대 1000자) |
+| 최대 시도 초과 | `Status='Failed'`로 두고 error 로그와 지표로 알린다. 원인을 고친 뒤 운영자가 `Status='Pending'`, `AttemptCount=0`으로 되돌려 재처리한다 |
+| lease 만료 | 다른 Dispatcher(다중 인스턴스)가 재claim한다. 유효한 lease가 있는 행은 다른 Dispatcher가 발행하지 않는다 |
+| 연결된 클라이언트가 없음 | 발행은 성공으로 보고 `Published`로 표시한다. 클라이언트는 재연결 때 전체 재조회와 fallback refresh로 따라잡는다 |
+
+**관측성:** 대기 행 수, 가장 오래된 대기 행의 나이, `Failed` 행 수, 발행 지연(`PublishedAt - EnqueuedAt`)을 지표로 낸다. `Failed`가 1건 이상이거나 가장 오래된 대기 행이 60초를 넘으면 경고 대상이다.
+
+**배포 제약:** SignalR backplane이 없는 동안 Hub 연결은 이벤트를 발행한 Server 인스턴스에만 있다. 따라서 backplane을 도입하기 전까지 Server는 한 인스턴스(또는 Dispatcher가 활성인 인스턴스 하나)로 운영한다. 다중 Server 확장 시 backplane을 도입한다(후속 범위).
 
 ## 14. Worker 설계
 
@@ -1290,4 +1329,4 @@ provisional login·session(§15.3)은 이미 확정되어 있으므로 이 항�
 
 ### 24.3 Projection 변경 알림 전달 (BE-12)
 
-권장 결정은 §13.4의 Transactional Outbox다. BE-12가 lease·retry·보관 정책 값과 시나리오별 동작을 확정한다. 확정 전에는 DB-02(Outbox 스키마)와 BE-08을 시작하지 않는다.
+확정(BE-12, 2026-10-07): §13.4의 Transactional Outbox와 §13.4.1의 전달 정책(설정값, claim, 시나리오별 동작, 관측성, 배포 제약)을 따른다. 결정 기록은 `docs/decisions/2026-10-07-be-12-projection-change-notification-transport.md`다.

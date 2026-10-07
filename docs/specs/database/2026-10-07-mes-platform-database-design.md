@@ -499,6 +499,7 @@ dbo.ProjectionChangeOutbox
 ├── NextAttemptAt              datetime2(3) NOT NULL
 ├── LeaseOwner                 nvarchar(100) NULL
 ├── LeaseExpiresAt             datetime2(3) NULL
+├── OperationId                uniqueidentifier NULL   -- Worker 작업의 OperationId (추적용)
 ├── EnqueuedAt                 datetime2(3) NOT NULL
 ├── PublishedAt                datetime2(3) NULL
 └── LastError                  nvarchar(1000) NULL
@@ -508,7 +509,8 @@ dbo.ProjectionChangeOutbox
 - 행은 `ProcessUnitStatusCurrent` Upsert, `ProjectionVersion` 기록과 같은 transaction에서 Insert한다.
 - Server의 Dispatcher가 `Pending` 행을 claim(`LeaseOwner`, `LeaseExpiresAt`)해 발행하고 `PublishedAt`을 기록한다. 전달은 at-least-once다(backend design §13.4).
 - `ChangedIdsJson`은 Dispatcher가 발행할 때만 파싱하며 일반 조회 경로에서는 읽지 않는다.
-- lease 기간, backoff, 최대 시도 횟수, 발행 완료 행 보관 기간은 BE-12가 정한다.
+- `Status`는 발행 완료 전까지 `Pending`이고 claim은 `LeaseOwner`·`LeaseExpiresAt`이 나타낸다. `Pending`/`Published`/`Failed` 외의 값은 없다.
+- 기본 index는 Dispatcher claim용 `(Status, NextAttemptAt, ProjectionChangeOutboxId)`이다. lease 기간, backoff, 최대 시도 횟수, 보관 기간은 backend design §13.4.1의 설정값이며 DDL에 하드코딩하지 않는다.
 
 ## 5. 페이지별 읽기·쓰기 원칙
 
