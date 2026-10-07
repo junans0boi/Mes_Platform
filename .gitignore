@@ -1,0 +1,32 @@
+# OS and editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.user
+*.suo
+
+# .NET
+**/bin/
+**/obj/
+TestResults/
+artifacts/
+
+# Node
+**/node_modules/
+**/dist/
+**/coverage/
+*.tsbuildinfo
+
+# Local agent output
+.claude/local/
+.codex/local/
+
+# Frontend test output
+**/playwright-report/
+**/test-results/
