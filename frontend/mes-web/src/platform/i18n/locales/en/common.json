@@ -1,0 +1,6 @@
+{
+  "signal": { "ok": "Normal", "running": "Running", "delayed": "Delayed", "fault": "Fault", "idle": "Idle" },
+  "ribbon": { "label": "Count by status" },
+  "action": { "retry": "Retry", "close": "Close", "openMenu": "Open menu" },
+  "state": { "loading": "Loading", "empty": "Nothing to show" }
+}

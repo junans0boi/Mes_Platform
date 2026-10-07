@@ -1,0 +1,68 @@
+{
+  "appName": "MES",
+  "skipToContent": "Skip to content",
+  "nav": {
+    "label": "Main menu",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
+    "menu": "Menu"
+  },
+  "modules": {
+    "dev": "Development preview"
+  },
+  "tabs": {
+    "label": "Open screens",
+    "close": "Close {{title}}"
+  },
+  "signalBar": {
+    "label": "Current status",
+    "plant": "Plant",
+    "plantNone": "Not selected",
+    "connection": "Connection",
+    "asOf": "As of",
+    "lastOperation": "Last operation",
+    "none": "None",
+    "user": "User",
+    "userNone": "Signed out",
+    "language": "Language",
+    "theme": "Color scheme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "density": "Table density",
+    "connectionState": {
+      "connected": "Connected",
+      "reconnecting": "Reconnecting",
+      "disconnected": "Disconnected",
+      "unknown": "No information"
+    },
+    "settings": "Display settings",
+    "densityOption": {
+      "compact": "Compact",
+      "standard": "Standard",
+      "comfortable": "Comfortable"
+    },
+    "ago": "{{count}}s ago",
+    "lastAsOf": "Last as of"
+  },
+  "boot": {
+    "loading": "Preparing the workspace",
+    "failedTitle": "Could not load startup information",
+    "failedBody": "Check the connection and try again. If it keeps failing, give the request ID to an administrator.",
+    "requestId": "Request ID"
+  },
+  "error": {
+    "routeTitle": "This screen could not be displayed",
+    "routeBody": "An unexpected error occurred. Try again or go to another screen.",
+    "notFoundTitle": "Screen not found",
+    "notFoundBody": "Check the address or pick a screen from the menu.",
+    "forbiddenTitle": "You do not have access to this screen",
+    "forbiddenBody": "Required permission: {{capability}}. Ask an administrator if you need access."
+  },
+  "beacon": {
+    "label": "Overall status",
+    "normal": "No issues",
+    "delayed": "Delays",
+    "fault": "Faults"
+  }
+}

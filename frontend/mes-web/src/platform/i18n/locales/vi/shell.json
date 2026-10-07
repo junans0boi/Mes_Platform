@@ -1,0 +1,68 @@
+{
+  "appName": "MES",
+  "skipToContent": "Chuyển đến nội dung",
+  "nav": {
+    "label": "Menu chính",
+    "collapse": "Thu gọn menu",
+    "expand": "Mở rộng menu",
+    "menu": "Menu"
+  },
+  "modules": {
+    "dev": "Xem trước phát triển"
+  },
+  "tabs": {
+    "label": "Màn hình đang mở",
+    "close": "Đóng {{title}}"
+  },
+  "signalBar": {
+    "label": "Trạng thái hiện tại",
+    "plant": "Plant",
+    "plantNone": "Chưa chọn",
+    "connection": "Kết nối",
+    "asOf": "Tại thời điểm",
+    "lastOperation": "Thao tác cuối",
+    "none": "Không có",
+    "user": "Người dùng",
+    "userNone": "Chưa đăng nhập",
+    "language": "Ngôn ngữ",
+    "theme": "Giao diện",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "themeSystem": "Theo hệ thống",
+    "density": "Mật độ bảng",
+    "connectionState": {
+      "connected": "Đã kết nối",
+      "reconnecting": "Đang kết nối lại",
+      "disconnected": "Mất kết nối",
+      "unknown": "Không có thông tin"
+    },
+    "settings": "Cài đặt hiển thị",
+    "densityOption": {
+      "compact": "Gọn",
+      "standard": "Chuẩn",
+      "comfortable": "Rộng"
+    },
+    "ago": "{{count}} giây trước",
+    "lastAsOf": "Lần cuối"
+  },
+  "boot": {
+    "loading": "Đang chuẩn bị màn hình",
+    "failedTitle": "Không tải được thông tin khởi động",
+    "failedBody": "Kiểm tra kết nối rồi thử lại. Nếu vẫn lỗi, hãy gửi mã yêu cầu cho quản trị viên.",
+    "requestId": "Mã yêu cầu"
+  },
+  "error": {
+    "routeTitle": "Không thể hiển thị màn hình này",
+    "routeBody": "Đã xảy ra lỗi không mong muốn. Hãy thử lại hoặc chuyển sang màn hình khác.",
+    "notFoundTitle": "Không tìm thấy màn hình",
+    "notFoundBody": "Kiểm tra địa chỉ hoặc chọn màn hình từ menu.",
+    "forbiddenTitle": "Bạn không có quyền xem màn hình này",
+    "forbiddenBody": "Quyền cần có: {{capability}}. Hãy liên hệ quản trị viên nếu cần quyền."
+  },
+  "beacon": {
+    "label": "Trạng thái chung",
+    "normal": "Không có vấn đề",
+    "delayed": "Có chậm trễ",
+    "fault": "Có lỗi"
+  }
+}

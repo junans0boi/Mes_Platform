@@ -1,0 +1,68 @@
+{
+  "appName": "MES",
+  "skipToContent": "본문으로 이동",
+  "nav": {
+    "label": "주 메뉴",
+    "collapse": "메뉴 접기",
+    "expand": "메뉴 펼치기",
+    "menu": "메뉴"
+  },
+  "modules": {
+    "dev": "개발 확인"
+  },
+  "tabs": {
+    "label": "열린 화면",
+    "close": "{{title}} 닫기"
+  },
+  "signalBar": {
+    "label": "현재 상태",
+    "plant": "Plant",
+    "plantNone": "선택 안 됨",
+    "connection": "연결",
+    "asOf": "기준 시각",
+    "lastOperation": "마지막 작업",
+    "none": "없음",
+    "user": "사용자",
+    "userNone": "로그인 전",
+    "language": "언어",
+    "theme": "화면 색상",
+    "themeLight": "밝게",
+    "themeDark": "어둡게",
+    "themeSystem": "시스템 설정",
+    "density": "표 밀도",
+    "connectionState": {
+      "connected": "연결됨",
+      "reconnecting": "재연결 중",
+      "disconnected": "끊김",
+      "unknown": "정보 없음"
+    },
+    "settings": "표시 설정",
+    "densityOption": {
+      "compact": "촘촘하게",
+      "standard": "표준",
+      "comfortable": "여유 있게"
+    },
+    "ago": "{{count}}초 전",
+    "lastAsOf": "마지막 기준"
+  },
+  "boot": {
+    "loading": "화면을 준비하고 있습니다",
+    "failedTitle": "시작 정보를 불러오지 못했습니다",
+    "failedBody": "연결을 확인한 뒤 다시 시도하세요. 계속 실패하면 요청 번호를 관리자에게 알려 주세요.",
+    "requestId": "요청 번호"
+  },
+  "error": {
+    "routeTitle": "화면을 표시하지 못했습니다",
+    "routeBody": "예기치 않은 오류가 발생했습니다. 다시 시도하거나 다른 화면으로 이동하세요.",
+    "notFoundTitle": "화면을 찾을 수 없습니다",
+    "notFoundBody": "주소를 확인하거나 왼쪽 메뉴에서 화면을 선택하세요.",
+    "forbiddenTitle": "이 화면을 볼 권한이 없습니다",
+    "forbiddenBody": "필요한 권한: {{capability}}. 권한이 필요하면 관리자에게 요청하세요."
+  },
+  "beacon": {
+    "label": "전체 상태",
+    "normal": "이상 없음",
+    "delayed": "지연 있음",
+    "fault": "이상 있음"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "signal": { "ok": "정상", "running": "진행 중", "delayed": "지연", "fault": "이상", "idle": "대기" },
+  "ribbon": { "label": "상태별 건수" },
+  "action": { "retry": "다시 시도", "close": "닫기", "openMenu": "메뉴 열기" },
+  "state": { "loading": "불러오는 중입니다", "empty": "표시할 항목이 없습니다" }
+}

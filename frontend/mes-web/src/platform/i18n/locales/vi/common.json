@@ -1,0 +1,6 @@
+{
+  "signal": { "ok": "Bình thường", "running": "Đang chạy", "delayed": "Chậm", "fault": "Lỗi", "idle": "Chờ" },
+  "ribbon": { "label": "Số lượng theo trạng thái" },
+  "action": { "retry": "Thử lại", "close": "Đóng", "openMenu": "Mở menu" },
+  "state": { "loading": "Đang tải", "empty": "Không có mục nào" }
+}
