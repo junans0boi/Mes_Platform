@@ -954,13 +954,11 @@ RequirePermission("Production.WorkOrder.ChangeStatus")
 - 사용자 저장소는 `IUserAuthenticator` seam 뒤에 둔다. 첫 슬라이스에는 Development 환경에서만 활성화되는 설정 기반 개발용 구현을 둔다. 운영 환경에서 이 구현이 활성화되면 시작을 거부한다. 실제 사용자·권한 저장소는 후속이다.
 - 이 계약은 BE-05의 결정과 무관하게 구현·사용할 수 있다. BE-05는 이 계약을 깨지 않는 추가(additive)만 할 수 있으며, 기존 필드의 변경이 필요하면 CON-02를 통해 FE·BE 합의 후에 한다.
 
-#### BE-05가 결정하는 범위 (§24.1)
+#### BE-05가 결정하는 범위 (§24.1) — 확정
 
-- refresh·logout endpoint와 요청·응답
-- refresh token: HttpOnly + Secure + SameSite cookie, rotation, 재사용 감지(방향은 확정, 속성 값과 동작은 BE-05가 결정)
-- cookie 이름·Path·Domain·SameSite 값·만료
-- CORS와 cookie를 함께 쓰는 배포 구성(동일 origin 여부)
-- 구현은 BE-11, 프론트 silent refresh는 FE-13
+**확정(BE-05, 2026-10-07)**: 상세 내용은 §24.1 및 `docs/decisions/2026-10-07-be-05-authentication-contract.md`를 참조한다.
+
+요약: cookie `__Host-mes_refresh`(HttpOnly·Secure·SameSite=Strict·Path=/), access 15분·refresh 유휴 8시간/절대 12시간, rotation + 재사용 감지(FamilyId 전체 폐기), 동일 Origin 기본, HTTPS 필수. 구현: BE-11. FE silent refresh: FE-13.
 
 ## 16. Operation과 추적성
 
@@ -1309,23 +1307,53 @@ Connection String과 JWT Secret은 소스에 저장하지 않는다. Worker가 A
 
 ### 24.1 인증 계약 (refresh·logout·cookie)
 
-provisional login·session(§15.3)은 이미 확정되어 있으므로 이 항목에 포함하지 않는다.
+**확정(BE-05, 2026-10-07)**: `docs/decisions/2026-10-07-be-05-authentication-contract.md` 참조.
 
-- refresh·logout endpoint와 요청·응답 형식
-- refresh cookie의 이름, Path, Domain, SameSite 값, 만료
-- rotation과 재사용 감지 시 동작(세션 전체 폐기 여부)
-- CORS와 cookie를 함께 쓰는 배포 구성(동일 origin 여부)
-- login 응답에 refresh cookie를 설정하는 변경(additive)의 표현
+provisional login·session(§15.3)은 그대로 유지하며, 다음을 additive로 추가한다.
+
+| 항목 | 확정값 |
+|---|---|
+| access token 수명 | 15분 |
+| refresh token | 256비트 무작위. DB에 SHA-256 해시 저장. |
+| cookie | `__Host-mes_refresh; HttpOnly; Secure; SameSite=Strict; Path=/` |
+| refresh 유휴/절대 수명 | 8시간 / 12시간 |
+| HTTPS | **필수** (공장 내부망 포함) |
+| 배포 | 동일 Origin 기본. 다른 Origin은 allowlist + `AllowCredentials`만 허용. |
+| rotation | refresh 호출마다 새 token 발급, 이전 token 즉시 무효화. `FamilyId`로 묶음. |
+| 재사용 감지 | 사용된 token 재사용 시 `FamilyId` 전체 폐기 + 401 `REFRESH_TOKEN_REUSED`. |
+| 동시 grace | 없음. |
+| logout 범위 | 현재 기기(세션)만. 전체 폐기는 재사용 감지 때만. |
+| endpoint | `POST /api/v1/auth/refresh`, `POST /api/v1/auth/logout` |
+
+오류 코드: `REFRESH_TOKEN_MISSING`, `REFRESH_TOKEN_INVALID`, `REFRESH_TOKEN_EXPIRED`, `REFRESH_TOKEN_REVOKED`, `REFRESH_TOKEN_REUSED`
+
+구현: BE-11. 프론트 silent refresh: FE-13.
 
 ### 24.2 WorkOrder 상태 전이
 
-- WorkOrder 상태 목록
-- 허용 상태 전이표
-- 첫 번째 UI에서 노출할 전이
-- 전이 실패(422)와 동시성 충돌(409)의 오류 `code`와 `args`
-- `ChangeWorkOrderStatus` Command의 요청 형식(`expectedVersion`, `reason` 필요 여부)
+**확정(BE-06, 2026-10-07)**: `docs/decisions/2026-10-07-be-06-workorder-status-transitions.md` 참조.
 
-위 두 항목(§24.1, §24.2)이 확정되기 전에는 프론트엔드가 silent refresh와 WorkOrder 상태 변경 UI를 구현하지 않는다. §24.3(BE-12)은 DB-02와 BE-08 착수 전에 확정한다.
+상태: `PLANNED`, `READY`, `IN_PROGRESS`, `COMPLETED`, `FINISHED`, `CANCELED`
+
+| 현재 → 목표 | reason 필수 | 권한 |
+|---|---|---|
+| PLANNED → READY | 아니오 | `Production.WorkOrder.ChangeStatus` |
+| PLANNED → IN_PROGRESS | 아니오 | `Production.WorkOrder.ChangeStatus` |
+| PLANNED → CANCELED | **예** | `Production.WorkOrder.ChangeStatus` |
+| READY → IN_PROGRESS | 아니오 | `Production.WorkOrder.ChangeStatus` |
+| READY → CANCELED | **예** | `Production.WorkOrder.ChangeStatus` |
+| IN_PROGRESS → COMPLETED | 아니오 | `Production.WorkOrder.ChangeStatus` |
+| COMPLETED → FINISHED | **예** | `Production.WorkOrder.Finish` |
+| 같은 상태 → 같은 상태 | — | 멱등 성공(422 없음) |
+| 그 밖 | — | 422 `WORK_ORDER_STATUS_TRANSITION_NOT_ALLOWED` |
+
+`IN_PROGRESS → CANCELED`: 첫 범위 제외. 동시성: 409 `WORK_ORDER_VERSION_CONFLICT`(expectedVersion 불일치).
+
+첫 UI 노출: `PLANNED`·`READY` → `IN_PROGRESS`(시작), `IN_PROGRESS` → `COMPLETED`(완료)만.
+
+구현: BE-10. FE: FE-12.
+
+위 두 항목(§24.1, §24.2)이 확정되었다. CON-02, BE-10, BE-11, FE-12, FE-13 착수 가능. §24.3(BE-12)은 DB-02와 BE-08 착수 전에 확정한다.
 
 ### 24.3 Projection 변경 알림 전달 (BE-12)
 

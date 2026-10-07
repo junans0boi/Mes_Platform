@@ -11,8 +11,8 @@ info:
     - 오류는 Problem Details(`code`, `args`, `errors[]`, `requestId`, `operationId`, `traceId`)를 쓴다.
     - 대용량 목록은 cursor로 조회한다. 페이지 번호 이동과 전체 건수(rowCount)는 제공하지 않는다.
     - `plantId`는 숨겨진 헤더가 아니라 모든 Plant 범위 경로의 명시적 parameter(query)다. 서버는 `allowedPlantIds`와 대조해 최종 검증한다.
-    - WorkOrder `status`는 문자열이다. 허용 값과 상태 전이는 BE-06 확정 전까지 계약에 정의하지 않는다.
-    - 인증 계약은 임시(provisional)다: access token 발급과 세션 조회만 있고 refresh·logout·cookie는 BE-05 결정 후 CON-02가 추가형으로 확장한다.
+    - WorkOrder `status` 허용 값: `PLANNED`, `READY`, `IN_PROGRESS`, `COMPLETED`, `FINISHED`, `CANCELED`. 상태 전이 계약은 CON-02(이 파일)에 정의되어 있다(BE-06 확정 반영).
+    - 인증 계약: access token 발급·세션 조회(CON-01 provisional)에 refresh·logout·cookie(CON-02, BE-05 확정)가 추가됐다.
     - SignalR 이벤트 계약은 `contracts/realtime-events.md`가 정본이다.
     - `nullable` 필드는 키가 항상 존재하고 값이 null이다. 키를 생략하는 것은 계약 위반이다(그래서 nullable 필드도 `required`에 들어 있다). `required`가 아닌 필드는 선택 입력(요청 parameter)뿐이다.
     - 64비트 정수(`int64`)는 JSON number로 보낸다. 브라우저의 `number`가 정확한 안전 정수 범위는 9007199254740991(2^53-1)이며, 이 계약의 모든 int64 값은 이 범위 안이어야 한다. 서버는 이 상한을 넘는 값을 만들지 않는다(`projectionVersion`은 DB sequence가 상한에서 오류를 내도록 정의한다).
@@ -22,9 +22,9 @@ servers:
   - url: /
 tags:
   - name: auth
-    description: 임시(provisional) 인증 계약
+    description: 인증 계약 (login·session은 CON-01 provisional; refresh·logout는 CON-02 확정)
   - name: production
-    description: 생산(작업지시) 조회
+    description: 생산(작업지시) 조회·Command
   - name: monitoring
     description: 실시간 공정 현황(Projection) 조회
 security:
@@ -44,7 +44,9 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: access token 발급. refresh token과 cookie는 이 계약에 없다.
+          description: |
+            access token 발급. 서버는 동시에 `Set-Cookie: __Host-mes_refresh` (HttpOnly; Secure; SameSite=Strict; Path=/)를 설정한다.
+            응답 본문 스키마는 변경 없음(additive).
           content:
             application/json:
               schema:
@@ -65,6 +67,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/auth/refresh:
+    post:
+      tags: [auth]
+      operationId: refreshToken
+      summary: refresh cookie로 새 access token을 발급한다 (CON-02)
+      description: |
+        요청 본문 없음. `__Host-mes_refresh` cookie를 읽어 새 access token을 반환한다.
+        rotation: 새 refresh token을 발급하고 이전 token은 즉시 무효화한다.
+        재사용 감지: 이미 사용된 token이 오면 FamilyId 전체를 폐기하고 401 `REFRESH_TOKEN_REUSED`를 반환한다.
+      security: []
+      responses:
+        '200':
+          description: 새 access token. 응답 헤더에 새 `Set-Cookie`가 포함된다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: |
+            refresh token 오류. code 값:
+            - `REFRESH_TOKEN_MISSING`: cookie 없음
+            - `REFRESH_TOKEN_INVALID`: 형식 오류·존재하지 않는 token
+            - `REFRESH_TOKEN_EXPIRED`: 유휴(8시간) 또는 절대(12시간) 만료
+            - `REFRESH_TOKEN_REVOKED`: logout 등 명시적 폐기
+            - `REFRESH_TOKEN_REUSED`: rotation 위반, FamilyId 전체 폐기
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/v1/auth/logout:
+    post:
+      tags: [auth]
+      operationId: logout
+      summary: 현재 기기 세션을 로그아웃한다 (CON-02)
+      description: |
+        현재 기기의 refresh token을 폐기하고 `Set-Cookie`로 cookie를 삭제한다.
+        다른 기기·family는 영향받지 않는다. 재사용 감지 시 폐기된 family는 이미 무효다.
+        요청 본문 없음.
+      responses:
+        '204':
+          description: 로그아웃 성공. Cookie 삭제됨.
         '401':
           $ref: '#/components/responses/Unauthorized'
   /api/v1/production/work-orders:
@@ -90,11 +135,11 @@ paths:
             default: '-plannedStartAt'
         - name: status
           in: query
-          description: 상태 필터(여러 개 가능). 허용 값은 BE-06 확정 전까지 정의하지 않는다.
+          description: 상태 필터(여러 개 가능).
           schema:
             type: array
             items:
-              type: string
+              $ref: '#/components/schemas/WorkOrderStatus'
           style: form
           explode: true
         - name: workOrderNumberPrefix
@@ -166,6 +211,52 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /api/v1/production/work-orders/{workOrderId}/status:
+    put:
+      tags: [production]
+      operationId: changeWorkOrderStatus
+      summary: 작업지시 상태를 변경한다 (CON-02)
+      description: |
+        권한 `Production.WorkOrder.ChangeStatus` (FINISHED 전이는 추가로 `Production.WorkOrder.Finish` 필요).
+        `plantId`는 필수이며 `allowedPlantIds`에 없으면 403이다.
+
+        허용 전이:
+        - PLANNED → READY, IN_PROGRESS, CANCELED(reason 필수)
+        - READY → IN_PROGRESS, CANCELED(reason 필수)
+        - IN_PROGRESS → COMPLETED
+        - COMPLETED → FINISHED(reason 필수, `Production.WorkOrder.Finish` 권한)
+        - 같은 상태 → 같은 상태: 멱등 성공(204)
+
+        `expectedVersion`은 상세 조회의 `rowVersion` Base64 값을 그대로 보낸다.
+        `Idempotency-Key` 헤더: 동일 Key 재요청은 한 번만 반영된다.
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeWorkOrderStatusRequest'
+      responses:
+        '204':
+          description: 상태 변경 성공(또는 멱등 성공).
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
   /api/v1/monitoring/process-unit-status:
     get:
       tags: [monitoring]
@@ -282,6 +373,24 @@ components:
             $ref: '#/components/schemas/ProblemDetails'
     NotFound:
       description: 대상 없음
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Conflict:
+      description: |
+        동시성 충돌. code: `WORK_ORDER_VERSION_CONFLICT` (args: `workOrderId`).
+        클라이언트는 최신 상세를 재조회해 `rowVersion`을 갱신한 후 재시도한다.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    UnprocessableEntity:
+      description: |
+        업무 규칙 위반(422). 오류 code:
+        - `WORK_ORDER_STATUS_TRANSITION_NOT_ALLOWED` (args: `currentStatus`, `targetStatus`): 허용되지 않은 전이
+        - `WORK_ORDER_REASON_REQUIRED` (args: `targetStatus`): reason 필수 전이에 reason 없음
+        - `WORK_ORDER_STATUS_INVALID` (args: `value`): 알 수 없는 상태 값
       content:
         application/problem+json:
           schema:
@@ -435,8 +544,7 @@ components:
           type: string
           nullable: true
         status:
-          type: string
-          description: 상태 문자열. 허용 값과 전이는 BE-06 확정 전까지 정의하지 않는다.
+          $ref: '#/components/schemas/WorkOrderStatus'
         plannedQuantity:
           type: integer
           format: int64
@@ -638,3 +746,29 @@ components:
           $ref: '#/components/schemas/ProcessUnitStatusListData'
         meta:
           $ref: '#/components/schemas/ApiMeta'
+    WorkOrderStatus:
+      type: string
+      description: |
+        작업지시 상태. 허용 전이는 `PUT /api/v1/production/work-orders/{workOrderId}/status` 참조.
+        COMPLETED: 생산 종료. FINISHED: 관리자 마감 확정(`Production.WorkOrder.Finish` 권한 + reason 필수).
+      enum: [PLANNED, READY, IN_PROGRESS, COMPLETED, FINISHED, CANCELED]
+    ChangeWorkOrderStatusRequest:
+      type: object
+      required: [plantId, targetStatus, expectedVersion]
+      properties:
+        plantId:
+          type: integer
+          format: int32
+          description: Plant 범위. allowedPlantIds와 대조 검증.
+        targetStatus:
+          $ref: '#/components/schemas/WorkOrderStatus'
+        expectedVersion:
+          type: string
+          format: byte
+          description: |
+            상세 조회의 `rowVersion`(Base64 불투명 문자열)을 그대로 보낸다.
+            불일치 시 409 `WORK_ORDER_VERSION_CONFLICT`.
+        reason:
+          type: string
+          maxLength: 500
+          description: CANCELED·FINISHED 전이(그리고 향후 reason 필수 전이)에 필수. 그 외에는 무시된다.

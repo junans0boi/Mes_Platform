@@ -4,7 +4,7 @@ title: "공유 API 계약 초안: openapi.yaml과 실시간 이벤트 계약"
 type: feature
 labels: feature, contract, gate:foundation
 depends_on: 없음
-status: ready
+status: done
 gate: foundation
 epic: "#1"
 epic_url: https://github.com/junans0boi/Mes_Platform/issues/1

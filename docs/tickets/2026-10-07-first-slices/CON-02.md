@@ -4,7 +4,7 @@ title: "공유 계약 추가: ChangeWorkOrderStatus와 인증 refresh"
 type: feature
 labels: feature, contract, deferred
 depends_on: BE-05, BE-06
-status: blocked
+status: done
 gate: deferred
 epic: "#1"
 epic_url: https://github.com/junans0boi/Mes_Platform/issues/1
@@ -42,9 +42,9 @@ BE-05, BE-06에서 확정된 내용을 공유 계약에 반영해 BE-10, BE-11, 
 
 ## 완료 조건
 
-- [ ] BE-06의 상태 전이표와 계약이 일치한다(전이값은 BE-06 문서에서만 가져온다)
-- [ ] BE-05의 인증 계약과 계약 파일이 일치한다
-- [ ] FE·BE 소유자 리뷰 기록이 있다
+- [x] BE-06의 상태 전이표와 계약이 일치한다(전이값은 BE-06 문서에서만 가져온다)
+- [x] BE-05의 인증 계약과 계약 파일이 일치한다
+- [x] FE·BE 소유자 리뷰 기록이 있다
 
 ## 테스트 방법
 
@@ -52,7 +52,11 @@ BE-05, BE-06에서 확정된 내용을 공유 계약에 반영해 BE-10, BE-11, 
 
 ## 완료 증거
 
-계약 diff 링크, 리뷰 기록
+- `contracts/openapi.yaml`: refresh·logout·ChangeWorkOrderStatus 경로 추가, WorkOrderStatus enum 추가, 409·422 응답 추가
+- `openapi-typescript` 파싱 성공(오류 0)
+- CON-01 소유자 리뷰 기록: `contracts/REVIEW.md` (2026-10-07 JunHwanLee)
+- BE-05 결정: `docs/decisions/2026-10-07-be-05-authentication-contract.md`
+- BE-06 결정: `docs/decisions/2026-10-07-be-06-workorder-status-transitions.md`
 
 ## 차단 조건
 
